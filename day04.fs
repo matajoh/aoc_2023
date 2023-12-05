@@ -60,5 +60,6 @@ let run =
     printfn "== Day04 =="
     let cards = File.ReadAllLines "inputs/day04.txt" |> Array.toList |> parseCards
 
-    printfn "Part1: %i" (part1 cards)
-    printfn "Part2: %i" (part2 cards)
+    printfn "Part 1: %i" (part1 cards)
+    printfn "Part 2: %i" (part2 cards)
+    printfn ""

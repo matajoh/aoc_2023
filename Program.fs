@@ -4,14 +4,16 @@
     | 2 -> Day02.run
     | 3 -> Day03.run
     | 4 -> Day04.run
+    | 5 -> Day05.run
     | _ -> printfn "Day %i not implemented" i
 
 [<EntryPoint>]
 let main argv =
-    printfn "Advent of Code 2023"
+    printfn "## Advent of Code 2023 ##"
+    printfn ""
     
     match argv.Length with
-    | 0 -> [1..4] 
+    | 0 -> [1..5] 
         |> Seq.iter (fun i -> run i)
     | _ -> argv
         |> Seq.map int
