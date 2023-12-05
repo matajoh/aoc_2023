@@ -29,14 +29,9 @@ let winningCount card =
     card.Numbers
     |> List.sumBy (fun n -> if card.WinningNumbers.Contains(n) then 1 else 0)
 
-let rec pow2 n =
-    match n with
-    | 0 -> 1
-    | _ -> (pow2 (n - 1)) <<< 1
-
 let score card =
     let count = winningCount card
-    if count = 0 then 0 else pow2 (count - 1)
+    if count = 0 then 0 else 1 <<< (count - 1)
 
 let part1 cards = (cards |> List.map score |> List.sum)
 

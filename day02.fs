@@ -33,7 +33,6 @@ let parseGame (s: string) =
     let handfuls = parts.[1].Split(';') |> Seq.map parseHandful |> Seq.toList
     { id = gameId; handfuls = handfuls }
 
-
 let isHandfulPossible bag handful =
     handful
     |> List.forall (fun blocks ->
@@ -49,7 +48,6 @@ let part1 games =
     let bag = { red = 12; green = 13; blue = 14 }
     games |> Seq.filter (isGamePossible bag) |> Seq.map (fun g -> g.id) |> Seq.sum
 
-
 let expandBagForBlocks bag blocks =
     match blocks with
     | Red(c) -> { bag with red = Math.Max(bag.red, c) }
@@ -60,23 +58,18 @@ let expandBagForBlocks bag blocks =
         { bag with
             blue = Math.Max(bag.blue, c) }
 
-
 let rec expandBagForHandful bag handful =
     match handful with
     | [] -> bag
-    | blocks :: rest ->
-        let bag = expandBagForBlocks bag blocks
-        expandBagForHandful bag rest
+    | blocks :: rest -> expandBagForHandful (expandBagForBlocks bag blocks) rest
 
 let minBagFor game =
     game.handfuls |> List.fold expandBagForHandful { red = 0; green = 0; blue = 0 }
 
 let power bag = bag.red * bag.green * bag.blue
 
-
 let part2 games =
     games |> Seq.map minBagFor |> Seq.map power |> Seq.sum
-
 
 let run =
     printfn "== Day 02 =="

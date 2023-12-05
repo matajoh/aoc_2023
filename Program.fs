@@ -5,6 +5,7 @@
     | 3 -> Day03.run
     | 4 -> Day04.run
     | 5 -> Day05.run
+    | 6 -> Day06.run
     | _ -> printfn "Day %i not implemented" i
 
 [<EntryPoint>]
@@ -13,7 +14,7 @@ let main argv =
     printfn ""
     
     match argv.Length with
-    | 0 -> [1..5] 
+    | 0 -> [1..6] 
         |> Seq.iter (fun i -> run i)
     | _ -> argv
         |> Seq.map int
