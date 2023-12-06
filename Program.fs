@@ -6,17 +6,16 @@
     | 4 -> Day04.run
     | 5 -> Day05.run
     | 6 -> Day06.run
+    | 7 -> Day07.run
     | _ -> printfn "Day %i not implemented" i
 
 [<EntryPoint>]
 let main argv =
     printfn "## Advent of Code 2023 ##"
     printfn ""
-    
+
     match argv.Length with
-    | 0 -> [1..6] 
-        |> Seq.iter (fun i -> run i)
-    | _ -> argv
-        |> Seq.map int
-        |> Seq.iter (fun i -> run i)
+    | 0 -> [ 1..7 ] |> Seq.iter (fun i -> run i)
+    | _ -> argv |> Seq.map int |> Seq.iter (fun i -> run i)
+
     0

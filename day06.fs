@@ -59,3 +59,4 @@ let run =
 
     printfn "Part 1: %i" (part1 lines)
     printfn "Part 2: %i" (part2 lines)
+    printfn ""
