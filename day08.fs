@@ -31,7 +31,7 @@ let parseNode (line: string) =
       Right = right }
 
 let parseNodes lines =
-    lines |> Array.map parseNode |> Array.map (fun n -> (n.Name, n)) |> Map.ofArray
+    lines |> Seq.map parseNode |> Seq.map (fun n -> (n.Name, n)) |> Map.ofSeq
 
 let rec traverse (nodes: Map<string, Node>) (moves: Move array) (states: State list) =
     let newStates =
@@ -70,7 +70,7 @@ let part2 (nodes: Map<string, Node>) moves =
 let run =
     printfn "== Day08 =="
 
-    let lines = File.ReadAllLines("inputs/day08.txt")
+    let lines = File.ReadLines("inputs/day08.txt") |> Seq.toList
     let moves = parseMoves lines[0]
     let nodes = parseNodes lines[2..]
 

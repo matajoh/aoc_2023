@@ -23,7 +23,8 @@ let parseCard (line: string) =
     { WinningNumbers = parseWinningNumbers parts.[0]
       Numbers = parseNumbers parts.[1] }
 
-let parseCards (lines: string list) = lines |> List.map parseCard
+let parseCards lines =
+    lines |> Seq.map parseCard |> Seq.toList
 
 let winningCount card =
     card.Numbers
@@ -42,18 +43,25 @@ let rec countWinningCards (cards: Card list) (cache: Option<int> array) card =
         let count =
             match winningCount cards.[card] with
             | 0 -> 1
-            | count -> [ card + 1 .. card + count ] |> List.map (countWinningCards cards cache) |> List.sum |> (+) 1
-        
+            | count ->
+                [ card + 1 .. card + count ]
+                |> List.map (countWinningCards cards cache)
+                |> List.sum
+                |> (+) 1
+
         cache.[card] <- Some(count)
         count
 
 let part2 cards =
     let cache = Array.create (List.length cards) None
-    [ 0 .. List.length cards - 1 ] |> List.map (countWinningCards cards cache) |> List.sum
+
+    [ 0 .. List.length cards - 1 ]
+    |> List.map (countWinningCards cards cache)
+    |> List.sum
 
 let run =
     printfn "== Day04 =="
-    let cards = File.ReadAllLines "inputs/day04.txt" |> Array.toList |> parseCards
+    let cards = File.ReadLines "inputs/day04.txt" |> parseCards
 
     printfn "Part 1: %i" (part1 cards)
     printfn "Part 2: %i" (part2 cards)

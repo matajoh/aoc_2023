@@ -26,16 +26,16 @@ let rec predictPrev values =
         List.head values - predictPrev grad
 
 let part1 sequences =
-    sequences |> Array.map predictNext |> Array.sum
+    sequences |> Seq.map predictNext |> Seq.sum
 
 let part2 sequences =
-    sequences |> Array.map predictPrev |> Array.sum
+    sequences |> Seq.map predictPrev |> Seq.sum
 
 let run =
     printfn "== Day 09 =="
 
     let sequences =
-        File.ReadAllLines("inputs/day09.txt") |> Array.map parseValues
+        File.ReadLines("inputs/day09.txt") |> Seq.map parseValues |> Seq.toList
 
     printfn "Part 1: %i" (part1 sequences)
     printfn "Part 2: %i" (part2 sequences)

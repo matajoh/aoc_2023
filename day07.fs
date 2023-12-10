@@ -130,7 +130,7 @@ let part2 lines = winnings true lines
 let run =
     printfn "== Day 07 =="
 
-    let lines = File.ReadAllLines "inputs/day07.txt" |> Array.toList
+    let lines = File.ReadLines "inputs/day07.txt" |> Seq.toList
 
     printfn "Part 1: %i" (part1 lines)
     printfn "Part 2: %i" (part2 lines)
