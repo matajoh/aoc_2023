@@ -75,6 +75,6 @@ let run =
 
     let image = System.IO.File.ReadLines "inputs/day11.txt" |> parseImage
 
-    printfn "Part1: %i" (part1 image)
-    printfn "Part2: %i" (part2 image)
+    printfn "Part 1: %i" (part1 image)
+    printfn "Part 2: %i" (part2 image)
     printfn ""
