@@ -68,7 +68,7 @@ let part2 (nodes: Map<string, Node>) moves =
     |> List.fold lcm 1UL
 
 let run =
-    printfn "== Day08 =="
+    printfn "== Day 08 =="
 
     let lines = File.ReadLines("inputs/day08.txt") |> Seq.toList
     let moves = parseMoves lines[0]

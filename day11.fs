@@ -71,7 +71,7 @@ let part1 image = sumLengths image 2UL
 let part2 image = sumLengths image 1000000UL
 
 let run =
-    printfn "== Day11 =="
+    printfn "== Day 11 =="
 
     let image = System.IO.File.ReadLines "inputs/day11.txt" |> parseImage
 

@@ -60,7 +60,7 @@ let part2 cards =
     |> List.sum
 
 let run =
-    printfn "== Day04 =="
+    printfn "== Day 04 =="
     let cards = File.ReadLines "inputs/day04.txt" |> parseCards
 
     printfn "Part 1: %i" (part1 cards)
