@@ -125,18 +125,18 @@ let neighbors tiles point =
 let findLoop tiles =
     let current = fst (neighbors tiles tiles.Start)
 
-    let rec f tiles start prev current =
+    let rec f tiles start prev current acc =
         if current = start then
-            [ start ]
+            List.rev (start :: acc)
         else
             let (a, b) = neighbors tiles current
 
             if a = prev then
-                current :: f tiles start current b
+                f tiles start current b (current :: acc)
             else
-                current :: f tiles start current a
+                f tiles start current a (current :: acc)
 
-    f tiles tiles.Start tiles.Start current
+    f tiles tiles.Start tiles.Start current []
 
 let part1 loop =
     let length = Set.count loop
