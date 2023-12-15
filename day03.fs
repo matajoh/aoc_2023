@@ -42,22 +42,21 @@ let adjacentSymbols schematic row column =
     |> Seq.choose id
     |> Seq.toList
 
-let rec partNumbers row column current adjacent schematic =
+let rec findPartNumbers row column current adjacent acc schematic =
     if row = List.length schematic then
-        []
+        List.rev acc
     elif column = List.length schematic.[row] then
-        partNumbers (row + 1) 0 current adjacent schematic
+        findPartNumbers (row + 1) 0 current adjacent acc schematic
     else
         match schematic.[row].[column] with
         | Digit(c) ->
             let newAdjacent = adjacent @ adjacentSymbols schematic row column
-            partNumbers row (column + 1) (current + string (c)) newAdjacent schematic
+            findPartNumbers row (column + 1) (current + string (c)) newAdjacent acc schematic
         | _ ->
             if adjacent.IsEmpty then
-                partNumbers row (column + 1) "" [] schematic
+                findPartNumbers row (column + 1) "" [] acc schematic
             else
-                (int current, adjacent |> List.distinct)
-                :: (partNumbers row (column + 1) "" [] schematic)
+                findPartNumbers row (column + 1) "" [] ((int current, adjacent |> List.distinct) :: acc) schematic
 
 let part1 partNumbers = partNumbers |> List.sumBy fst
 
@@ -80,7 +79,7 @@ let run =
     printfn "== Day 03 =="
 
     let lines = File.ReadLines("inputs/day03.txt") |> Seq.toList
-    let partNumbers = lines |> parse |> partNumbers 0 0 "" []
+    let partNumbers = lines |> parse |> findPartNumbers 0 0 "" [] []
 
     printfn "Part 1: %A" (part1 partNumbers)
     printfn "Part 2: %A" (part2 partNumbers)

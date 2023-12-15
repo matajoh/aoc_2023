@@ -52,21 +52,24 @@ let map entry seeds =
     let length = seeds.End - seeds.Start
     { Start = start; End = start + length }
 
-let rec mapSeeds seeds overlaps =
+let rec mapSeeds acc seeds overlaps =
     match overlaps with
-    | [] when seeds.End > seeds.Start -> [ seeds ]
-    | [] -> []
+    | [] when seeds.End > seeds.Start -> List.rev (seeds :: acc)
+    | [] -> List.rev acc
     | (entry, overlap) :: tail ->
         let mapped = map entry overlap
         let remaining = { Start = overlap.End; End = seeds.End }
 
         if seeds.Start < overlap.Start then
-            { Start = seeds.Start
-              End = overlap.Start }
-            :: mapped
-            :: mapSeeds remaining tail
+            mapSeeds
+                ({ Start = seeds.Start
+                   End = overlap.Start }
+                 :: mapped
+                 :: acc)
+                remaining
+                tail
         else
-            mapped :: mapSeeds remaining tail
+            mapSeeds (mapped :: acc) remaining tail
 
 let applyMap map seeds =
     map.Entries
@@ -76,7 +79,7 @@ let applyMap map seeds =
         | None -> None)
     |> List.choose id
     |> List.sortBy (fun (_, o) -> o.Start)
-    |> mapSeeds seeds
+    |> mapSeeds [] seeds
 
 let getLocations almanac seedRanges =
     almanac.Maps
@@ -89,15 +92,15 @@ let part1 almanac =
     |> List.map (fun r -> r.Start)
     |> List.min
 
-let rec toRanges seeds =
+let rec toRanges acc seeds =
     match seeds with
-    | [] -> []
-    | start :: range :: tail -> { Start = start; End = start + range } :: toRanges tail
+    | [] -> List.rev acc
+    | start :: range :: tail -> toRanges ({ Start = start; End = start + range } :: acc) tail
     | [ _ ] -> failwith "Invalid seeds"
 
 let part2 almanac =
     almanac.Seeds
-    |> toRanges
+    |> toRanges []
     |> getLocations almanac
     |> List.map (fun r -> r.Start)
     |> List.min

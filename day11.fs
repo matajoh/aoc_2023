@@ -46,19 +46,19 @@ let parseImage lines =
       EmptyRows = emptyRows
       EmptyCols = emptyCols }
 
-let rec expandedDistance empties expansion i0 i1 =
+let rec expandedDistance acc empties expansion i0 i1 =
     if i0 > i1 then
-        expandedDistance empties expansion i1 i0
+        expandedDistance acc empties expansion i1 i0
     elif i0 = i1 then
-        0UL
+        acc
     elif Set.contains i0 empties then
-        expansion + expandedDistance empties expansion (i0 + 1) i1
+        expandedDistance (acc + expansion) empties expansion (i0 + 1) i1
     else
-        1UL + expandedDistance empties expansion (i0 + 1) i1
+        expandedDistance (acc + 1UL) empties expansion (i0 + 1) i1
 
 let distance image expansion g0 g1 =
-    let dx = expandedDistance image.EmptyCols expansion g0.X g1.X
-    let dy = expandedDistance image.EmptyRows expansion g0.Y g1.Y
+    let dx = expandedDistance 0UL image.EmptyCols expansion g0.X g1.X
+    let dy = expandedDistance 0UL image.EmptyRows expansion g0.Y g1.Y
     dx + dy
 
 let sumLengths image expansion =

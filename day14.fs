@@ -113,10 +113,10 @@ let tiltEast p =
 let spin p =
     p |> tiltNorth |> tiltWest |> tiltSouth |> tiltEast
 
-let rec sample n platform =
+let rec sample acc n platform =
     match n with
-    | 0 -> []
-    | _ -> (Platform.totalLoad platform) :: (sample (n - 1) (spin platform))
+    | 0 -> List.rev acc
+    | _ -> sample ((Platform.totalLoad platform) :: acc) (n - 1) (spin platform)
 
 let isPattern length samples =
     let start = List.length samples - 2 * length
@@ -136,7 +136,7 @@ let part1 platform =
 
 let part2 platform =
     let numSamples = 200
-    let pattern = sample numSamples platform |> findPattern 50
+    let pattern = sample [] numSamples platform |> findPattern 50
     pattern[(1000000000 - numSamples) % List.length pattern]
 
 let run =
