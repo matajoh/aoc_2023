@@ -69,3 +69,4 @@ let run =
 
     printfn "Part 1: %d" (part1 steps)
     printfn "Part 2: %A" (part2 steps)
+    printfn ""
