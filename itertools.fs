@@ -30,3 +30,13 @@ let row pattern r =
 
 let rows a =
     [ 0 .. Array2D.length1 a - 1 ] |> List.map (row a)
+
+let rowColumnOrder a =
+    seq {
+        for r in 0 .. Array2D.length1 a - 1 do
+            yield!
+                seq {
+                    for c in 0 .. Array2D.length2 a - 1 do
+                        yield Array2D.get a r c
+                }
+    }

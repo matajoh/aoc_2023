@@ -19,11 +19,11 @@ type AStar<'S> when 'S: comparison(distance, heuristic, neighbors, goal) =
         f [] current
 
     member public this.FindMinPath start =
-        let mutable queue = new PriorityQueue<'S, int>()
+        let queue = new PriorityQueue<'S, int>()
         queue.Enqueue(start, 0)
-        let mutable gScore = new Dictionary<'S, int>()
+        let gScore = new Dictionary<'S, int>()
         gScore[start] <- 0
-        let mutable cameFrom = new Dictionary<'S, 'S>()
+        let cameFrom = new Dictionary<'S, 'S>()
 
         let rec f (queue : PriorityQueue<'S, int>) (gScore: Dictionary<'S, int>) (cameFrom: Dictionary<'S, 'S>) =
             if queue.Count = 0 then
