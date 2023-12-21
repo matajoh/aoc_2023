@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="itertools.fs" />
     <Compile Include="algorithms.fs" />
+    <Compile Include="math.fs" />
     <Compile Include="day*.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -2,6 +2,8 @@ module Day08
 
 open System.IO
 
+open Math
+
 type Move =
     | Left
     | Right
@@ -49,10 +51,6 @@ let rec traverse (nodes: Map<string, Node>) (moves: Move array) (states: State l
         newStates |> List.map snd
     else
         traverse nodes moves newStates
-
-let rec gcd a b = if b = 0UL then a else gcd b (a % b)
-
-let lcm a b = a * (b / gcd a b)
 
 let part1 nodes moves =
     traverse nodes moves [ "AAA", 0 ] |> List.head
