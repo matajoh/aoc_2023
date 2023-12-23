@@ -37,15 +37,7 @@ type Garden =
         | Start(p) -> { g with Start = p }
 
     static member canMoveTo g p =
-        let x = if p.X < 0 then g.Width + (p.X % g.Width) else p.X % g.Width
-
-        let y =
-            if p.Y < 0 then
-                g.Height + (p.Y % g.Height)
-            else
-                p.Y % g.Height
-
-        Set.contains { X = x; Y = y } g.Rocks |> not
+        Set.contains { X = modulo p.X g.Width; Y = modulo p.Y g.Height } g.Rocks |> not
 
 let parseLine y line =
     line

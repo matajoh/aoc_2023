@@ -10,3 +10,9 @@ let quadratic a b c x =
     let c' = uint64 c
     let x' = uint64 x
     a'*x'*x' + b'*x' + c'
+
+let modulo a b =
+    if a < 0 then
+        b + (a % b)
+    else
+        a % b
