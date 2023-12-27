@@ -1,89 +1,75 @@
 module Day24
 
 open System.IO
-open System.Collections.Generic
 open IterationTools
-
-type Vec2 = {X: int64; Y : int64}
-
-type Vec3 =
-    {X: int64; Y: int64; Z: int64}
-    static member create v = {X=Array.get v 0; Y=v[1]; Z=v[2]}
-    static member toString v = sprintf "%d, %d, %d" v.X v.Y v.Z
-    static member distance (a,b) = abs (a.X - b.X) + abs (a.Y - b.Y) + abs (a.Z - b.Z)
-    static member to2D v = {X=v.X; Y=v.Y}
-    static member (+) (a,b) = {X=a.X+b.X; Y=a.Y+b.Y; Z=a.Z+b.Z}
-    static member (*) (a:int64,b) = {X=a*b.X; Y=a*b.Y; Z=a*b.Z}
-    static member (-) (a,b) = {X=a.X-b.X; Y=a.Y-b.Y; Z=a.Z-b.Z}
-    static member (/) (a, b:int64) = {X=a.X/b; Y=a.Y/b; Z=a.Z/b}
-
-type Line2D =
-    {Start: Vec2; Direction: Vec2}
-    static member valid l (p : decimal * decimal) =
-        let dx = fst p - decimal l.Start.X
-        let dy = snd p - decimal l.Start.Y
-        sign dx = sign l.Direction.X && sign dy = sign l.Direction.Y
-    static member intersect l0 l1 =
-        let a0 = decimal l0.Direction.Y
-        let b0 = decimal -l0.Direction.X
-        let a1 = decimal l1.Direction.Y
-        let b1 = decimal -l1.Direction.X
-        
-        let w = a0 * b1 - a1 * b0
-        if w = 0m then
-            None
-        else
-            let c0 = -a0*(decimal l0.Start.X )- b0*(decimal l0.Start.Y)
-            let c1 = -a1*(decimal l1.Start.X) - b1*(decimal l1.Start.Y)
-            let x = b0 * c1 - b1 * c0
-            let y = a1 * c0 - a0 * c1
-            Some (x/w, y/w)
-
-type Line3D =
-    {Start: Vec3; Direction: Vec3}
-    static member to2D l =
-        {Start=Vec3.to2D l.Start; Direction=Vec3.to2D l.Direction} : Line2D
-    static member at l t = l.Start + t * l.Direction
-    static member toString v =
-        sprintf "%s @ %s" (Vec3.toString v.Start) (Vec3.toString v.Direction)
-
-type Rect2D =
-    {Left: decimal; Top: decimal; Right: decimal; Bottom: decimal}
-    static member create x y w h = {Left=x; Top=y; Right=x+w; Bottom=y+h}
-    static member inside r (x, y) = not (x < r.Left || x > r.Right || y < r.Top || y > r.Bottom)
+open Math
 
 let parseLine (line: string) =
     let parts = line.Split('@')
-    let start = parts[0].Split(',') |> Array.map int64 |> Vec3.create
-    let dir = parts[1].Split(',') |> Array.map int64 |> Vec3.create
-    {Start=start; Direction=dir}
+    let start = parts[0].Split(',') |> Array.map rational |> Vector3.create
+    let dir = parts[1].Split(',') |> Array.map rational |> Vector3.create
+    { Start = start; Direction = dir }
 
-let part1 (lines : Line3D list) =
-    let bounds = Rect2D.create 200000000000000m 200000000000000m 200000000000000m 200000000000000m
-    lines
-    |> List.map (Line3D.to2D)
+let part1 (rays: Ray3 list) =
+    let p = rational 200000000000000L
+    let w = rational 200000000000000L
+    let bounds =
+        Rectangle2.create p p w w
+
+    rays
+    |> List.map (Ray3.xy)
     |> combinations
     |> List.choose (fun (a, b) ->
-        match Line2D.intersect a b with
+        match Ray2.intersect a b with
         | None -> None
-        | Some p ->
-            if Line2D.valid a p && Line2D.valid b p then
-                Some p
-            else None)
-    |> List.filter (Rect2D.inside bounds)
+        | Some p -> if Ray2.valid a p && Ray2.valid b p then Some p else None)
+    |> List.filter (Rectangle2.inside bounds)
     |> List.length
 
 type State = int64 list * int64
 
-let part2 (lines : Line3D list) =
-    // TODO had to use an external solver to get this
-    // would rather have it within F#, but will require some work
-    557789988450159L
+let part2 (rays: Ray3 list) =
+    let xyRow (i, j) =
+        let r0 = rays[i]
+        let r1 = rays[j]
+        let row = [ r1.DY - r0.DY; r0.DX - r1.DX; r0.Y - r1.Y; r1.X - r0.X ]
+        row        
+
+    let xyB (i, j) =
+        let r0 = rays[i]
+        let r1 = rays[j]
+        r0.DX * r0.Y + r1.DY * r1.X - r0.DY * r0.X - r1.DX * r1.Y
+
+    let abde =
+        let A = [ 0..4 ] |> List.pairwise |> List.map xyRow |> array2D |> Matrix.create
+        let b = [| 0..4 |] |> Array.pairwise |> Array.map xyB |> Vector.create
+        let x = (Matrix.inverse A) * b
+        x.A |> Array.toList |> List.map (fun d -> Option.get (Rational.toInt d))
+
+    let xzRow (i, j) =
+        let r0 = rays[i]
+        let r1 = rays[j]
+        [ r1.DZ - r0.DZ; r0.DX - r1.DX; r0.Z - r1.Z; r1.X - r0.X ]
+
+    let xzB (i, j) =
+        let r0 = rays[i]
+        let r1 = rays[j]
+        r0.DX * r0.Z + r1.DZ * r1.X - r0.DZ * r0.X - r1.DX * r1.Z
+
+    let acdf =
+        let A = [ 0..4 ] |> List.pairwise |> List.map xzRow |> array2D |> Matrix.create
+        let b = [| 0..4 |] |> Array.pairwise |> Array.map xzB |> Vector.create
+        let x = (Matrix.inverse A) * b
+        x.A |> Array.toList |> List.map (fun d -> Option.get (Rational.toInt d))
+
+    match abde, acdf with
+    | x::y::_, _::z::_ -> x + y + z
+    | _ -> failwith "Invalid state"
 
 let run =
     printfn "== Day 24 =="
 
-    let lines = File.ReadLines("inputs/day24.txt") |> Seq.map parseLine |> Seq.toList
+    let rays = File.ReadLines("inputs/day24.txt") |> Seq.map parseLine |> Seq.toList
 
-    printfn "Part 1: %d" (part1 lines)
-    printfn "Part 2: %d" (part2 lines)
+    printfn "Part 1: %d" (part1 rays)
+    printfn "Part 2: %d" (part2 rays)

@@ -1,4 +1,6 @@
-﻿let run i =
+﻿open Math
+
+let run i =
     match i with
     | 1 -> Day01.run
     | 2 -> Day02.run
@@ -26,6 +28,8 @@
     | 24 -> Day24.run
     | 25 -> Day25.run
     | _ -> printfn "Day %i not implemented" i
+
+open Math
 
 [<EntryPoint>]
 let main argv =

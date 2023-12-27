@@ -7,7 +7,7 @@ type Point =
     { X: int
       Y: int }
 
-    static member neighbors p =
+    static member neighbors (p : Point) =
         seq {
             { p with X = p.X - 1 }
             { p with X = p.X + 1 }

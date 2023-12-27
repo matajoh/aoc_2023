@@ -2,8 +2,6 @@ module Day25
 
 open System.IO
 
-let rng = new System.Random()
-
 type NodeInfo =
     { ID: int
       Size: int }
@@ -51,23 +49,22 @@ type Graph =
 
         { g with Nodes = nodes; Edges = edges }
 
-    static member removeRandomEdge g =
-        let edges = g.Edges |> List.distinct
-        Graph.mergeNodes edges[rng.Next(List.length edges)] g
+    static member removeRandomEdge (rng : System.Random) g =
+        Graph.mergeNodes g.Edges[rng.Next(List.length g.Edges)] g
 
     static member nodes g = g.Nodes |> Map.toList |> List.map snd
 
-    static member contract t g =
+    static member contract rng t g =
         let rec f c =
             if Graph.count c = t then
                 c
             else
-                c |> Graph.removeRandomEdge |> f
+                c |> Graph.removeRandomEdge rng |> f
 
         f g
 
     // https://en.wikipedia.org/wiki/Karger%27s_algorithm
-    static member kargerStein limit g =
+    static member kargerStein rng limit g =
         let rec f i limit cs =
             if i = limit then
                 None
@@ -78,12 +75,15 @@ type Graph =
                     let n = Graph.count c
 
                     if n <= 6 then
-                        let c' = Graph.contract 2 c
-                        if Graph.cut c' = 3 then Some c' else f (i + 1) limit tail
+                        let c' = Graph.contract rng 2 c
+                        if Graph.cut c' = 3 then
+                            printfn "%d" i
+                            Some c'
+                        else f (i + 1) limit tail
                     else
                         let t = int (System.Math.Ceiling(1.0 + (float n) / System.Math.Sqrt(2.0)))
-                        let g1 = c |> Graph.contract t
-                        let g2 = c |> Graph.contract t
+                        let g1 = c |> Graph.contract rng t
+                        let g2 = c |> Graph.contract rng t
                         f i limit (g1 :: g2 :: tail)
 
         f 0 limit [ g ]
@@ -97,7 +97,8 @@ let parseGraph lines =
     lines |> Seq.toList |> List.collect parseLine |> Graph.create
 
 let rec findCut g =
-    match Graph.kargerStein 8192 g with
+    let rng = new System.Random()
+    match Graph.kargerStein rng 8192 g with
     | Some g' -> g'
     | None ->
         printfn "trying another seed..."
