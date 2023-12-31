@@ -165,7 +165,7 @@ let part1 stack =
     canRemove stack (ids |> Set) ids |> Set.count
 
 let part2 stack =
-    stack.Bricks |> brickIDs |> List.map (Stack.remove stack) |> List.sum
+    stack.Bricks |> brickIDs |> List.toArray |> Array.Parallel.map (Stack.remove stack) |> Array.sum
 
 let run =
     printfn "== Day 22 =="

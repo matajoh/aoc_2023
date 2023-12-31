@@ -208,12 +208,12 @@ let inline rational n =
 
 let array2DToString a =
     let vals = a |> rowColumnOrder |> Seq.toList
-    let hasNegative = vals |> List.exists (fun v -> v < Rational.Zero)
+    let hasNegative = vals |> List.exists (fun v -> v < 0m)
 
     let s =
         vals
         |> List.map (fun d ->
-            if d >= Rational.Zero && hasNegative then
+            if d >= 0m && hasNegative then
                 " " + d.ToString()
             else
                 d.ToString())
@@ -239,15 +239,15 @@ let array2DToString a =
          |> String.concat ",\n ")
 
 type Vector2 =
-    { X: Rational
-      Y: Rational }
+    { X: decimal
+      Y: decimal }
 
-    static member create(a: Rational array) = { X = a[0]; Y = a[1] }
-    static member zero = { X = Rational.Zero; Y = Rational.Zero }
+    static member create(a: decimal array) = { X = a[0]; Y = a[1] }
+    static member zero = { X = 0m; Y = 0m }
     static member (+)(a, b) = { X = a.X + b.X; Y = a.Y + b.Y }
     static member (-)(a, b) = { X = a.X - b.X; Y = a.Y - b.Y }
     static member (*)(a, b) = { X = a.X * b.X; Y = a.Y * b.Y }
-    static member (*)(a: Rational, b) = { X = a * b.X; Y = a * b.Y }
+    static member (*)(a: decimal, b) = { X = a * b.X; Y = a * b.Y }
     static member dot a b = a.X * b.X + a.Y * b.Y
 
     static member toString v =
@@ -255,12 +255,12 @@ type Vector2 =
 
 
 type Matrix2 =
-    { A: Rational
-      B: Rational
-      C: Rational
-      D: Rational }
+    { A: decimal
+      B: decimal
+      C: decimal
+      D: decimal }
 
-    static member (*)(lhs: Rational, rhs: Matrix2) =
+    static member (*)(lhs: decimal, rhs: Matrix2) =
         { A = lhs * rhs.A
           B = lhs * rhs.B
           C = lhs * rhs.C
@@ -293,30 +293,22 @@ type Matrix2 =
     static member inverse m =
         let det = Matrix2.determinant m
 
-        if det = Rational.Zero then
+        if det = 0m then
             None
         else
-            Some(Rational.invert det * { A = m.D; B = -m.B; C = -m.C; D = m.A })
+            Some((1m / det) * { A = m.D; B = -m.B; C = -m.C; D = m.A })
 
     static member transpose m = { m with B = m.C; C = m.B }
 
     static member trace m = m.A + m.D
 
-    static member identity =
-        { A = Rational.One
-          B = Rational.Zero
-          C = Rational.Zero
-          D = Rational.One }
+    static member identity = { A = 1m; B = 0m; C = 0m; D = 1m }
 
-    static member zero =
-        { A = Rational.Zero
-          B = Rational.Zero
-          C = Rational.Zero
-          D = Rational.Zero }
+    static member zero = { A = 0m; B = 0m; C = 0m; D = 0m }
 
     static member create(a, b, c, d) = { A = a; B = b; C = c; D = d }
 
-    static member create(a: Rational array) =
+    static member create(a: decimal array) =
         assert (Array.length a = 4)
 
         { A = a[0]
@@ -324,7 +316,7 @@ type Matrix2 =
           C = a[2]
           D = a[3] }
 
-    static member create(a: Rational list) =
+    static member create(a: decimal list) =
         assert (List.length a = 4)
 
         { A = a[0]
@@ -332,7 +324,7 @@ type Matrix2 =
           C = a[2]
           D = a[3] }
 
-    static member create(a: Rational array2d) =
+    static member create(a: decimal array2d) =
         assert (Array2D.length1 a = 2 && Array2D.length2 a = 2)
 
         { A = a[0, 0]
@@ -346,16 +338,13 @@ type Matrix2 =
     static member toString m = m |> Matrix2.toArray |> array2DToString
 
 type Vector3 =
-    { X: Rational
-      Y: Rational
-      Z: Rational }
+    { X: decimal
+      Y: decimal
+      Z: decimal }
 
-    static member create(a: Rational array) = { X = a[0]; Y = a[1]; Z = a[2] }
+    static member create(a: decimal array) = { X = a[0]; Y = a[1]; Z = a[2] }
 
-    static member zero =
-        { X = Rational.Zero
-          Y = Rational.Zero
-          Z = Rational.Zero }
+    static member zero = { X = 0m; Y = 0m; Z = 0m }
 
     static member toString v =
         sprintf "[%s, %s, %s]" (v.X.ToString()) (v.Y.ToString()) (v.Z.ToString())
@@ -375,7 +364,7 @@ type Vector3 =
           Y = a.Y * b.Y
           Z = a.Z * b.Z }
 
-    static member (*)(a: Rational, b) =
+    static member (*)(a: decimal, b) =
         { X = a * b.X
           Y = a * b.Y
           Z = a * b.Z }
@@ -397,17 +386,17 @@ type Vector3 =
     static member yz v = { X = v.Y; Y = v.Z }
 
 type Matrix3 =
-    { A: Rational
-      B: Rational
-      C: Rational
-      D: Rational
-      E: Rational
-      F: Rational
-      G: Rational
-      H: Rational
-      I: Rational }
+    { A: decimal
+      B: decimal
+      C: decimal
+      D: decimal
+      E: decimal
+      F: decimal
+      G: decimal
+      H: decimal
+      I: decimal }
 
-    static member (*)(lhs: Rational, rhs: Matrix3) =
+    static member (*)(lhs: decimal, rhs: Matrix3) =
         { A = lhs * rhs.A
           B = lhs * rhs.B
           C = lhs * rhs.C
@@ -465,11 +454,11 @@ type Matrix3 =
     static member inverse m =
         let det = Matrix3.determinant m
 
-        if det = Rational.Zero then
+        if det = 0m then
             None
         else
             Some(
-                (Rational.invert det)
+                (1m / det)
                 * { A = m.E * m.I - m.F * m.H
                     B = -(m.B * m.I - m.C * m.H)
                     C = m.B * m.F - m.C * m.E
@@ -493,28 +482,28 @@ type Matrix3 =
     static member trace m = m.A + m.E + m.I
 
     static member identity =
-        { A = Rational.One
-          B = Rational.Zero
-          C = Rational.Zero
-          D = Rational.Zero
-          E = Rational.One
-          F = Rational.Zero
-          G = Rational.Zero
-          H = Rational.Zero
-          I = Rational.One }
+        { A = 1m
+          B = 0m
+          C = 0m
+          D = 0m
+          E = 1m
+          F = 0m
+          G = 0m
+          H = 0m
+          I = 1m }
 
     static member zero =
-        { A = Rational.Zero
-          B = Rational.Zero
-          C = Rational.Zero
-          D = Rational.Zero
-          E = Rational.Zero
-          F = Rational.Zero
-          G = Rational.Zero
-          H = Rational.Zero
-          I = Rational.Zero }
+        { A = 0m
+          B = 0m
+          C = 0m
+          D = 0m
+          E = 0m
+          F = 0m
+          G = 0m
+          H = 0m
+          I = 0m }
 
-    static member create(a: Rational array) =
+    static member create(a: decimal array) =
         assert (Array.length a = 9)
 
         { A = a[0]
@@ -527,7 +516,7 @@ type Matrix3 =
           H = a[7]
           I = a[8] }
 
-    static member create(a: Rational list) =
+    static member create(a: decimal list) =
         assert (List.length a = 9)
 
         { A = a[0]
@@ -540,7 +529,7 @@ type Matrix3 =
           H = a[7]
           I = a[8] }
 
-    static member create(a: Rational array2d) =
+    static member create(a: decimal array2d) =
         assert (Array2D.length1 a = 3 && Array2D.length2 a = 3)
 
         { A = a[0, 0]
@@ -644,9 +633,14 @@ type Matrix =
 
         let rec f n (a: Rational array2d) =
             if n = 2 then
-                a |> Matrix2.create |> Matrix2.determinant
+                a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]
             elif n = 3 then
-                a |> Matrix3.create |> Matrix3.determinant
+                a[0, 0] * a[1, 1] * a[2, 2]
+                + a[0, 1] * a[1, 2] * a[2, 0]
+                + a[0, 2] * a[1, 0] * a[2, 1]
+                - a[0, 2] * a[1, 1] * a[2, 0]
+                - a[0, 1] * a[1, 0] * a[2, 2]
+                - a[0, 0] * a[1, 2] * a[2, 1]
             else
                 [ 0 .. n - 1 ]
                 |> List.map (fun i -> i, sub a (n - 1) i)
@@ -765,13 +759,14 @@ type Matrix =
 
     static member toArray m = m.A
 
-    static member toString m = m.A |> array2DToString
+    static member toString m =
+        m.A |> Array2D.map Rational.toDecimal |> array2DToString
 
 type Ray2 =
     { Start: Vector2
       Direction: Vector2 }
 
-    static member valid l (p: Rational * Rational) =
+    static member valid l (p: decimal * decimal) =
         let dx = fst p - l.Start.X
         let dy = snd p - l.Start.Y
         sign dx = sign l.Direction.X && sign dy = sign l.Direction.Y
@@ -784,7 +779,7 @@ type Ray2 =
 
         let w = a0 * b1 - a1 * b0
 
-        if w = Rational.Zero then
+        if w = 0m then
             None
         else
             let c0 = -a0 * l0.Start.X - b0 * l0.Start.Y
@@ -815,10 +810,10 @@ type Ray3 =
         sprintf "%s @ %s" (Vector3.toString v.Start) (Vector3.toString v.Direction)
 
 type Rectangle2 =
-    { Left: Rational
-      Top: Rational
-      Right: Rational
-      Bottom: Rational }
+    { Left: decimal
+      Top: decimal
+      Right: decimal
+      Bottom: decimal }
 
     static member create x y w h =
         { Left = x
